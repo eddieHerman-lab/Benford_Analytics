@@ -1,4 +1,4 @@
-# Benford_Analytics
+# Ánalise de benford
 
 # Benford Analytics: Ferramenta para Análise e Detecção de Anomalias pela Lei de Benford
 
