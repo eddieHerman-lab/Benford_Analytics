@@ -41,3 +41,16 @@ Para rodar este projeto em sua máquina:
    ```bash
    git clone [https://github.com/SeuNomeDeUsuario/NomeDoSeuRepositorio.git](https://github.com/SeuNomeDeUsuario/NomeDoSeuRepositorio.git)
    cd NomeDoSeuRepositorio
+2. Crie um ambiente virtual (recomendado):
+Bash
+python -m venv venv
+
+3. Ative o ambiente virtual:
+
+Windows: venv\Scripts\activate
+macOS/Linux: source venv/bin/activate
+Instale as dependências:
+Bash
+
+pip install -r requirements.txt
+(Certifique-se de criar um arquivo requirements.txt contendo todas as bibliotecas usadas: streamlit, pandas, numpy, plotly, scipy, reportlab, odfpy, openpyxl, pyxlsb, xlrd).
