@@ -1,0 +1,17 @@
+# Dados sensíveis
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor
+.vscode/
+.idea/
+
+# Logs e databases
+*.log
+*.sqlite
+*.db
