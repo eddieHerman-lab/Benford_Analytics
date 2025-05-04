@@ -54,3 +54,4 @@ Bash
 
 pip install -r requirements.txt
 (Certifique-se de criar um arquivo requirements.txt contendo todas as bibliotecas usadas: streamlit, pandas, numpy, plotly, scipy, reportlab, odfpy, openpyxl, pyxlsb, xlrd).
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://seu-app.streamlit.app)
