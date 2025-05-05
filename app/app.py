@@ -268,7 +268,7 @@ def create_pdf(observed_counts, benford_dist, chi2, p_value, total_count, column
 tab1, tab2 = st.tabs(["Análise de Benford", "Sobre a Lei de Benford"])
 
 with tab1:
-    st.title("📊 Análise de Benford para Detecção de Anomalias")
+    st.title(" Análise de Benford para Detecção de Anomalias")
 
     # Upload do arquivo
     uploaded_file = st.file_uploader("Carregue seu arquivo (CSV ou Excel)",
@@ -413,7 +413,7 @@ with tab1:
                 # Futuramente: opção para usar valor absoluto?
 
             # Botão para iniciar análise
-            if st.button("📊 Iniciar Análise de Benford"):
+            if st.button(" Iniciar Análise de Benford"):
                 with st.spinner("Analisando dados..."):
                     # Preparar dados para análise - usar df_clean que contém colunas numéricas tratadas
                     analysis_data_series = df_clean[col].copy()
