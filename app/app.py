@@ -792,4 +792,4 @@ with tab1:
     st.markdown(
         "**Benford Analytics** © 2025 | Ferramenta desenvolvida para análise de dados por meio da Lei de Benford")
     st.caption(
-        "Versão 1.0.0 | Esta ferramenta é destinada
+        "Versão 1.0.0 | Esta ferramenta é destinada"
