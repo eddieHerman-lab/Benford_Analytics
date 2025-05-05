@@ -1,6 +1,8 @@
 import re
 from io import BytesIO
-
+from reportlab.platypus import Image
+from reportlab.lib.styles import ParagraphStyle
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -166,12 +168,43 @@ def create_pdf(observed_counts, benford_dist, chi2, p_value, total_count, column
     # Adicionar ou modificar estilos para a conclusão, se desejar cores/ênfase
     h3_style = styles['Heading3']  # Estilo para subtítulos menores
 
-    # Título e informações
-    elements.append(Paragraph("Relatório de Análise pela Lei de Benford", title_style))
-    elements.append(Spacer(1, 12))
-    elements.append(Paragraph(f"Coluna analisada: {column_name}", subtitle_style))
-    elements.append(Paragraph(f"Total de registros analisados: {total_count}", normal_style))  # Clarify 'analisados'
-    elements.append(Spacer(1, 12))
+    # Estilos personalizados
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(
+        name='Titulo',
+        fontSize=18,
+        textColor=colors.navy,
+        spaceAfter=12,
+        leading=22
+    ))
+    styles.add(ParagraphStyle(
+        name='ConclusaoAlerta',
+        fontSize=12,
+        textColor=colors.darkred,
+        backColor=colors.pink,
+        spaceAfter=12,
+        leading=14
+    ))
+
+    def add_header(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica-Bold', 10)
+        canvas.drawString(50, 750, "Relatório Gerado por Benford Analytics")
+        canvas.restoreState()
+
+    def add_footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 8)
+        canvas.drawString(50, 50, "Página %d" % doc.page)
+        canvas.drawRightString(550, 50, "Confidencial - © 2024 Benford Analytics")
+        canvas.restoreState()
+
+    # Cabeçalho
+    elements.append(Paragraph("Relatório de Análise pela Lei de Benford", styles['Titulo']))
+    elements.append(Paragraph(f"Arquivo Analisado: {column_name}", styles['Heading2']))
+    elements.append(Paragraph(f"Total de Registros: {total_count:,}", styles['Normal']))
+    elements.append(Spacer(1, 24))
+
 
     # Resultados do teste e métricas de desvio
     elements.append(Paragraph("Resultados da Análise Estatística:", subtitle_style))
@@ -228,7 +261,27 @@ def create_pdf(observed_counts, benford_dist, chi2, p_value, total_count, column
             f"{benford_pct:.2f}%",
             f"{diff:+.2f}%"
         ])
+    try:
+        # 1. Criar um gráfico com matplotlib (ou salvar o gráfico do Streamlit)
+        fig, ax = plt.subplots(figsize=(8, 4))
+        digits = list(range(1, 10))
+        ax.bar(digits, [observed_counts.get(d, 0) / total_count * 100 for d in digits], alpha=0.7, label='Observado')
+        ax.plot(digits, [benford_dist[d - 1] * 100 for d in digits], 'r--', label='Benford')
+        ax.set_xlabel('Primeiro Dígito')
+        ax.set_ylabel('Frequência (%)')
+        ax.legend()
 
+        # 2. Salvar em um arquivo temporário
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
+            fig.savefig(tmpfile.name, dpi=150, bbox_inches='tight')
+            plt.close(fig)  # Fechar a figura para liberar memória
+
+            # 3. Adicionar ao PDF
+            elements.append(Spacer(1, 12))
+            elements.append(Paragraph("Comparação Observado vs. Esperado:", subtitle_style))
+            elements.append(Image(tmpfile.name, width=400, height=250))
+    except Exception as e:
+        elements.append(Paragraph("Erro ao gerar gráfico: " + str(e), normal_style))
     # Criar e estilizar a tabela
     table = Table(data)
     table.setStyle(TableStyle([
@@ -255,13 +308,22 @@ def create_pdf(observed_counts, benford_dist, chi2, p_value, total_count, column
     Um desvio significativo desta distribuição pode indicar dados manipulados ou anômalos.
     O teste estatístico aplicado (chi-quadrado) ajuda a quantificar o grau de conformidade
     dos dados com a distribuição esperada pela Lei de Benford.
+    MAD: "Desvio médio absoluto em relação à distribuição esperada. Valores acima de 1% indicam alto risco."
+
+    SAD: "Soma total das diferenças absolutas. Valores acima de 10% são críticos."
     As métricas MAD (Mean Absolute Deviation) e SAD (Sum of Absolute Differences) fornecem
     uma medida do tamanho total do desvio em relação à distribuição esperada.
     """, normal_style))  # Adicionada menção a MAD/SAD
-
+    # Conclusão com estilo personalizado
+    elements.append(Paragraph("Conclusão:", styles['Heading2']))
+    conclusion_style = styles['ConclusaoAlerta'] if mad >= 0.010 else styles['Normal']
+    elements.append(Paragraph(conclusion_text, conclusion_style))
     # Gerar o PDF
-    doc.build(elements)
+    # No final, ao construir o PDF:
+    doc.build(elements, onFirstPage=add_header, onLaterPages=add_footer)
     return buffer
+
+
 
 
 # Interface do usuário em abas
