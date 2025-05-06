@@ -3,6 +3,7 @@ from io import BytesIO
 from reportlab.platypus import Image
 from reportlab.lib.styles import ParagraphStyle
 import matplotlib.pyplot as plt
+import tempfile
 import numpy as np
 import pandas as pd
 import plotly.express as px
